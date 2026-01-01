@@ -98,8 +98,8 @@
 #     else:
 #         st.warning("Please upload a resume and paste the job description.")
 
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 import os
 import re
