@@ -100,7 +100,6 @@
 
 # from dotenv import load_dotenv
 # load_dotenv()
-
 import os
 import re
 import json
@@ -111,8 +110,19 @@ from PyPDF2 import PdfReader
 # ======================
 # CONFIG
 # ======================
-genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-model = genai.GenerativeModel("gemini-2.5-flash")
+
+API_KEY = os.getenv("GOOGLE_API_KEY")
+if not API_KEY:
+    st.error("GOOGLE_API_KEY is not set. Please configure it in Render Environment Variables.")
+    st.stop()
+
+genai.configure(api_key=API_KEY)
+
+@st.cache_resource
+def load_model():
+    return genai.GenerativeModel("gemini-2.5-flash")
+
+model = load_model()
 
 # ======================
 # FUNCTIONS
@@ -124,6 +134,7 @@ def get_gemini_response(prompt, resume_text, jd_text):
     return response.text
 
 
+@st.cache_data
 def extract_text_from_pdf(uploaded_file):
     reader = PdfReader(uploaded_file)
     text = ""
@@ -183,8 +194,9 @@ uploaded_file = st.file_uploader("📎 Upload Resume (PDF)", type=["pdf"])
 
 if st.button("🔍 Analyze Resume"):
     if uploaded_file and jd.strip():
-        resume_text = extract_text_from_pdf(uploaded_file)
-        response = get_gemini_response(input_prompt, resume_text, jd)
+        with st.spinner("Analyzing resume with ATS..."):
+            resume_text = extract_text_from_pdf(uploaded_file)
+            response = get_gemini_response(input_prompt, resume_text, jd)
 
         try:
             data = parse_model_response(response)
@@ -214,7 +226,7 @@ if st.button("🔍 Analyze Resume"):
             st.subheader("📝 Profile Summary")
             st.write(profile_summary)
 
-        except Exception as e:
+        except Exception:
             st.error("❌ Unable to parse model response")
             st.text(response)
 
