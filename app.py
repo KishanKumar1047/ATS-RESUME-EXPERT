@@ -100,7 +100,6 @@
 
 # from dotenv import load_dotenv
 # load_dotenv()
-import os
 import re
 import json
 import streamlit as st
@@ -108,19 +107,17 @@ import google.generativeai as genai
 from PyPDF2 import PdfReader
 
 # ======================
-# CONFIG
+# CONFIG (Streamlit-only)
 # ======================
-
-API_KEY = os.getenv("GOOGLE_API_KEY")
-if not API_KEY:
-    st.error("GOOGLE_API_KEY is not set. Please configure it in Render Environment Variables.")
+if "GOOGLE_API_KEY" not in st.secrets:
+    st.error("GOOGLE_API_KEY is not set in Streamlit Secrets.")
     st.stop()
 
-genai.configure(api_key=API_KEY)
+genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 
 @st.cache_resource
 def load_model():
-    return genai.GenerativeModel("gemini-2.5-flash")
+    return genai.GenerativeModel("gemini-1.5-flash")
 
 model = load_model()
 
@@ -194,8 +191,9 @@ uploaded_file = st.file_uploader("📎 Upload Resume (PDF)", type=["pdf"])
 
 if st.button("🔍 Analyze Resume"):
     if uploaded_file and jd.strip():
+        resume_text = extract_text_from_pdf(uploaded_file)
+
         with st.spinner("Analyzing resume with ATS..."):
-            resume_text = extract_text_from_pdf(uploaded_file)
             response = get_gemini_response(input_prompt, resume_text, jd)
 
         try:
