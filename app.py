@@ -100,6 +100,10 @@
 
 # from dotenv import load_dotenv
 # load_dotenv()
+
+import sys
+st.write(sys.version)
+
 import re
 import json
 import streamlit as st
