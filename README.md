@@ -129,14 +129,3 @@ You are free to modify and extend it.
 ⭐ If you found this project helpful, consider starring the repository!
 
 ```
-
----
-
-If you want, I can also:
-- Write a **GitHub project description**
-- Add **badges** (Python, Streamlit, Gemini)
-- Create a **portfolio-ready README version**
-- Add **deployment steps (Streamlit Cloud)**
-
-Just tell me 🚀
-```
